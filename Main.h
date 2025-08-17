@@ -83,3 +83,4 @@ extern std::vector<SendFileInfo> sendFileList;
 extern int whle_temp;
 extern int whle;
 
+extern bool isTrd;

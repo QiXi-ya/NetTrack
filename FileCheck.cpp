@@ -18,7 +18,8 @@ const vector<string> CheckFileList =
     "ofstartimage.dll",
     "NetTrackHt.dll",
     "NetTrack_imgPack.dll",
-    "config.ini"
+    "config.ini",
+    "NetTrackImgManager.dll"
 };
 
 const int number = 8;

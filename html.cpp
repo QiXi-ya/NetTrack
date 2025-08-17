@@ -409,7 +409,6 @@ public:
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			impl.m_hwnd = NULL;
-			UnregisterClass(L"EnhancedHtmlWnd", GetModuleHandle(NULL));
 			return 0;
 		case WM_HTML_LOADED:
 			if (IsWindow(impl.m_hwnd)) InvalidateRect(hwnd, nullptr, TRUE);

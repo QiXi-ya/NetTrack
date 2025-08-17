@@ -1417,7 +1417,6 @@ public:
                 a.detach();
                 needlockX = false;
                 needlockXXFrame = 0;
-                lockM.clear();
             }
         }
 
@@ -1916,6 +1915,14 @@ void choose5OBI(int i)
         Net::exit();
         exit(0xFF);
     }
+    if (i == 5)
+    {
+        ofstream del("del");
+        del << "0.1bf";
+        del.close();
+        Net::exit();
+        exit(0xFF);
+    }
 }
 
 bool isGotoChoose4 = false;//是否进入设置详细选项
@@ -1931,6 +1938,8 @@ bool isOpen = false;
 PIMAGE screenShot = newimage();
 
 bool Manager = false;
+
+PIMAGE gogogo = newimage();
 
 class html
 {
@@ -1961,6 +1970,8 @@ public:
 
             Manager = false;
             delimage(temp);
+
+            UnregisterClass(L"EnhancedHtmlWnd", GetModuleHandle(NULL));
         }
     }
 };
@@ -1968,6 +1979,40 @@ public:
 void choose6Choose(int MSK_TEMP)
 {
     int MSK = MSK_TEMP + 1;
+    if (MSK == 1)
+    {
+        int color[3] = { 150,150,150 };
+        int FontColor[3] = { 0,0,0 };
+        string b[3] = { "OK","NULL","NULL" };
+        msg::MessageBar(color, FontColor, "NetTrack - v0.1_bf_Beta", b);
+    }
+    if (MSK == 2)
+    {
+        ifstream update("UpdateLog.log");
+        if (!update.is_open())
+        {
+            string noChangelogMsg[8] = {
+        "找不到或不存在更新日志",        // Chinese (Simplified)
+        "No changelog found or doesn't exist",  // English
+     "更新履歴が見つからないか存在しません",  // Japanese
+      "변경 로그를 찾을 수 없거나 존재하지 않습니다",  // Korean
+      "Aucun journal des modifications trouvé ou inexistant",  // French
+      "Kein Änderungsprotokoll gefunden oder nicht vorhanden",  // German
+      "Журнал изменений не найден или не существует",  // Russian
+      "No se encontró el registro de cambios o no existe"  // Spanish
+            };
+            int c[3] = { 255,150,150 };
+            int fc[3] = { -1,-1,-1 };
+            msg::Message(2, c, fc, 240, noChangelogMsg[stoi(userset[0])]);
+            update.close();
+        }
+        else
+        {
+            update.close();
+            CopyFileW(L"UpdateLog.log", L"UpdateLog.html",0);
+            system("start UpdateLog.html");
+        }
+    }
     if (MSK == 3)
     {
 		if(!isOpen)
@@ -2003,6 +2048,363 @@ void choose6Choose(int MSK_TEMP)
             ShowWindow(MK, SW_SHOWNORMAL);
         }
         isOpen = true;
+    }
+    if (MSK == 4)
+    {
+        MSG msg = {};
+        PIMAGE nek = newimage();
+        getimage(nek, screenShot, 0, 0, windowSize.x, windowSize.y);
+        img::BlurWithDownscale_Gaussian(nek, 7, 2);
+
+        int frame = 0;
+        int Y = 0;
+
+        wstring supportOptionsW[8][2] = {
+    {L"报告BUG", L"支持我们"},     // Chinese
+    {L"Report Bug", L"Support Us"}, // English
+    {L"バグ報告", L"サポート"},    // Japanese
+    {L"버그 제보", L"후원하기"},   // Korean
+    {L"Signaler un bug", L"Nous soutenir"}, // French
+    {L"Fehler melden", L"Unterstützen Sie uns"}, // German
+    {L"Сообщить об ошибке", L"Поддержите нас"}, // Russian
+    {L"Reportar error", L"Apóyanos"} // Spanish
+        };
+        wstring githubStarRequestW[8] = {
+    L"在GitHub上为NetTrack打星",      // Chinese
+    L"Star NetTrack on GitHub",       // English
+    L"GitHubでNetTrackをスターする",  // Japanese
+    L"GitHub에서 NetTrack 스타하기",  // Korean
+    L"Étoilez NetTrack sur GitHub",   // French
+    L"NetTrack auf GitHub mit Stern bewerten", // German
+    L"Поставьте звезду NetTrack на GitHub", // Russian
+    L"Dale una estrella a NetTrack en GitHub" // Spanish
+        };
+
+        wstring msgA = supportOptionsW[stoi(userset[0])][0] + L" : " + L"Qixi_Ya@outlook.com";
+        wstring msgB = githubStarRequestW[stoi(userset[0])] + L" : " + L"https://github.com/QiXi-ya/NetTrack   ★";
+        wstring msgC = supportOptionsW[stoi(userset[0])][1] + L"  (p≧w≦q)";
+
+        for (int i = 0; i < 16; i++)
+        {
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            delay_fps(100);
+            cleardevice();
+            putimage(0, 0, screenShot);
+
+            putimage_alphablend(NULL, nek, 0, 0, i * 16);
+
+            if (i * 16 > 150)
+            {
+                if (DarkMode)setfillcolor(EGERGBA(0, 0, 0, i * 16 - 150));
+                else setfillcolor(EGERGBA(255, 255, 255, i * 16 - 150));
+                ege_fillrect(0, 0, windowSize.x, windowSize.y);
+            }
+
+            int start = 0;
+            int end = 100;
+            double t = frame / (double)15;
+            Y = start + (end - start) * ease::easeOut(t, 3);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 600,15);
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+            DrawManager::startText();
+
+            frame++;
+        }
+
+
+        int pngAlpha = 10;
+
+        while (!keystate(0x01))
+        {
+            delay_fps(60);
+            cleardevice();
+            putimage_alphablend(NULL, nek, 0, 0, 240);
+            if (DarkMode)setfillcolor(EGERGBA(0, 0, 0,90));
+            else setfillcolor(EGERGBA(255, 255, 255,90));
+            ege_fillrect(0, 0, windowSize.x, windowSize.y);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 600, 15);
+
+            mousePos = Window::GetMousePosX();
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+
+            if (getwidth(gogogo) > 0)
+            {
+                putimage_alphablend(NULL, gogogo, windowSize.x / 2 - getwidth(gogogo) / 2, Y + 300, pngAlpha);
+            }
+            else
+            {
+                setcolor(EGERGB(255, 100, 100));
+                xyprintf(windowSize.x / 2, Y + 200, L"ERROR");
+            }
+            DrawManager::startText();
+
+
+            if (mousePos.y > Y + 270 && mousePos.y < Y + 330 + getheight(gogogo) && mousePos.x > windowSize.x / 2 - getwidth(gogogo) / 2 - 30 && mousePos.x < windowSize.x / 2 + getwidth(gogogo) / 2 + 30)
+            {
+                if (pngAlpha < 255)
+                {
+                    if (pngAlpha + 8 < 255)pngAlpha += 8;
+                    else pngAlpha = 255;
+                }
+            }
+            else
+            {
+                if (pngAlpha > 10)
+                {
+                    if (pngAlpha - 8 > 10) pngAlpha -= 8;
+                    else pngAlpha = 10;
+                }
+            }
+
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+        }
+
+        frame = 0;
+
+        for (int i = 15; i >= 0; i--)
+        {
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            delay_fps(60);
+            cleardevice();
+            putimage(0, 0, screenShot);
+
+            putimage_alphablend(NULL, nek, 0, 0, i * 16);
+
+            if (i * 16 > 150)
+            {
+                if (DarkMode)setfillcolor(EGERGBA(0, 0, 0, i * 16 - 150));
+                else setfillcolor(EGERGBA(255, 255, 255, i * 16 - 150));
+                ege_fillrect(0, 0, windowSize.x, windowSize.y);
+            }
+
+            int start = 100;
+            int end = -200;
+            double t = frame / (double)15;
+            Y = start + (end - start) * ease::easeInBack(t, 3);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 600, 15);
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+            DrawManager::startText();
+
+            frame++;
+        }
+    }
+    if (MSK == 5)
+    {
+        MSG msg = {};
+        PIMAGE nek = newimage();
+        getimage(nek, screenShot, 0, 0, windowSize.x, windowSize.y);
+        img::BlurWithDownscale_Gaussian(nek, 7, 2);
+
+        int frame = 0;
+        int Y = 0;
+
+        wstring emailTextW[8] = {
+    L"邮箱",         // Chinese
+    L"Email",       // English
+    L"メールアドレス", // Japanese
+    L"이메일",      // Korean
+    L"Email",       // French
+    L"E-Mail",      // German
+    L"Электронная почта", // Russian
+    L"Correo electrónico" // Spanish
+        };
+
+        wstring msgA = emailTextW[stoi(userset[0])] + L" : " + L"Qixi_Ya@outlook.com";
+        wstring msgB = L"GitHub : https://github.com/QiXi-ya/NetTrack";
+        wstring msgC = L"Bilibili : https://space.bilibili.com/3494360421238894?spm_id_from=333.337.0.0";
+        wstring msgD = L"YouTube : https://www.youtube.com/@QiXi_Ya";
+
+        for (int i = 0; i < 16; i++)
+        {
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            delay_fps(100);
+            cleardevice();
+            putimage(0, 0, screenShot);
+
+            putimage_alphablend(NULL, nek, 0, 0, i * 16);
+
+            if (i * 16 > 150)
+            {
+                if (DarkMode)setfillcolor(EGERGBA(0, 0, 0, i * 16 - 150));
+                else setfillcolor(EGERGBA(255, 255, 255, i * 16 - 150));
+                ege_fillrect(0, 0, windowSize.x, windowSize.y);
+            }
+
+            int start = 0;
+            int end = 100;
+            double t = frame / (double)15;
+            Y = start + (end - start) * ease::easeOut(t, 3);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 500, 15);
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+            xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+            DrawManager::startText();
+
+            frame++;
+        }
+
+        int temp = 0;
+
+        while (1)
+        {
+            delay_fps(60);
+            cleardevice();
+            putimage_alphablend(NULL, nek, 0, 0, 240);
+            if (DarkMode)setfillcolor(EGERGBA(0, 0, 0, 90));
+            else setfillcolor(EGERGBA(255, 255, 255, 90));
+            ege_fillrect(0, 0, windowSize.x, windowSize.y);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 500, 15);
+
+            bool ohx = false;
+            for (int i = 0; i < 3; i++)
+            {
+                if (mousePos.y > Y + 60 + i * 100 && mousePos.y < Y + 140 + i * 100)
+                {
+                    temp = i + 1;
+                    ohx = true;
+                    break;
+                }
+            }
+            if (!ohx)
+            {
+                temp = 0;
+            }
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            if(temp == 1)
+            {
+                xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+                xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+                setcolor(EGERGB(100, 150, 255));
+                xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            }
+            else if (temp == 2)
+            {
+                xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+                xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+                setcolor(EGERGB(100, 150, 255));
+                xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+            }
+            else if (temp == 3)
+            {
+                xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+                xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+                setcolor(EGERGB(100, 150, 255));
+                xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+            }
+            else
+            {
+                xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+                xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+                xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+            }
+            DrawManager::startText();
+
+            mousePos = Window::GetMousePosX();
+
+            if (keystate(0x01))
+            {
+                
+                        if (temp == 1) ShellExecuteW(NULL, L"open", L"https://github.com/QiXi-ya/NetTrack", NULL, NULL, SW_SHOWNORMAL);
+                        if (temp == 2) ShellExecuteW(NULL, L"open", L"https://space.bilibili.com/3494360421238894?spm_id_from=333.337.0.0", NULL, NULL, SW_SHOWNORMAL);
+                        if (temp == 3) ShellExecuteW(NULL, L"open", L"https://www.youtube.com/@QiXi_Ya", NULL, NULL, SW_SHOWNORMAL);
+                        break;
+            }
+
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+        }
+
+        frame = 0;
+
+        for (int i = 15; i >= 0; i--)
+        {
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            delay_fps(60);
+            cleardevice();
+            putimage(0, 0, screenShot);
+
+            putimage_alphablend(NULL, nek, 0, 0, i * 16);
+
+            if (i * 16 > 150)
+            {
+                if (DarkMode)setfillcolor(EGERGBA(0, 0, 0, i * 16 - 150));
+                else setfillcolor(EGERGBA(255, 255, 255, i * 16 - 150));
+                ege_fillrect(0, 0, windowSize.x, windowSize.y);
+            }
+
+            int start = 100;
+            int end = -200;
+            double t = frame / (double)15;
+            Y = start + (end - start) * ease::easeInBack(t, 3);
+
+            DrawManager::setFillRectColor();
+            DrawManager::fillroundrectwithrect(50, Y - 50, windowSize.x - 100, 500, 15);
+
+            DrawManager::centerText();
+            DrawManager::setFont(40);
+            xyprintf(windowSize.x / 2, Y, msgA.c_str());
+            xyprintf(windowSize.x / 2, Y + 100, msgB.c_str());
+            xyprintf(windowSize.x / 2, Y + 200, msgC.c_str());
+            xyprintf(windowSize.x / 2, Y + 300, msgD.c_str());
+            DrawManager::startText();
+
+            frame++;
+        }
     }
 }
 
@@ -7582,7 +7984,7 @@ void DrawChoose(int userBarChoose)
         }
     }
 
-    if ((linkJD != "N" && userBarChoose == 1 && AddLinkXChange < windowSize.x / 4 * 3) || (mousePos.y > windowSize.y - 60))
+    if ((linkJD != "N" && userBarChoose == 1 && AddLinkXChange < windowSize.x / 4 * 3) || (mousePos.y > windowSize.y - 60 && userBarChoose != 6))
     {
         if (!upLink)
         {
@@ -7877,10 +8279,10 @@ void Draw()
         const int totalFrames = easeTM; // 帧数更大，动画更慢
         double t = 1.0 - (GS / static_cast<double>(totalFrames));
 
-        if (targetW < startSize.x && targetH < startSize.y) t = ease::easeOut(t, 1.2);
+        if (targetW < startSize.x && targetH < startSize.y) t = ease::easeOut(t, 2.5);
         else
         {
-            t = ease::easeInOutBack(t, 2);
+            t = ease::easeInOutBack(t, 1.2);
         }
 
         int newX = static_cast<int>(startPos.x + (targetX - startPos.x) * t);
@@ -8934,6 +9336,13 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
             MessageBoxA(NULL, "code:NETTRACKHTLOST", "NetTrackERROR", MB_OK + MB_SYSTEMMODAL + 16);
             exit(-1);
         }
+
+        if (!isFile("NetTrackImgManager.dll"))
+        {
+            MessageBoxA(NULL, "code:NETTRACKIMGMANAGERLOST", "NetTrackERROR", MB_OK + MB_SYSTEMMODAL + 16);
+            exit(-1);
+        }
+
         // 注册窗口类
         WNDCLASS wc = { 0 };
         wc.lpfnWndProc = WindowProc_class::WindowProc;
@@ -9034,6 +9443,12 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
 
     
     ReadIni();
+
+    FileControl::UnpackFilesFromOne("NetTrackImgManager.dll", "");
+    getimage(gogogo, "1.jpg", 0, 0);
+    img::zoomImage(gogogo, 200, 200);
+    remove("1.jpg"); remove("2.png");
+
     
     ip_local = Net::get_local_ip();
     if (stoi(userset[9]) == 0) port = GenerateDynamicPort();
@@ -9428,7 +9843,7 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
     delimage(rt);
     trd::RemoveTrayIcon(mainHwnd);
     WindowProc_class::UninstallMouseHook();
-
+    delimage(gogogo);
     Net::exit();
     return 0;
 

@@ -20,21 +20,26 @@
             PostQuitMessage(0);
             break;
         case WM_TRAYICON:
-            if (lParam == WM_LBUTTONUP) { // 鼠标左键弹起
-                /*
-                if (!g_lastReceivedFilePath.empty()) {
-                    // 打开文件夹并选中文件
-                    PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(g_lastReceivedFilePath.c_str());
-                    if (pidl) {
-                        SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
-                        ILFree(pidl);
-                    }
-                }
-                */
+        {
+            // 处理托盘图标消息
+            // 用户点击了气泡
+            
+            switch (lParam) {
+            case WM_LBUTTONDOWN:
+                // 左键点击
+                MessageBoxA(hWnd, "托盘图标被左键点击", "提示", MB_OK);
+                break;
+            case WM_RBUTTONDOWN:
+                // 右键点击
+                MessageBoxA(hWnd, "托盘图标被右键点击", "提示", MB_OK);
+                break;
+            case WM_LBUTTONDBLCLK:
+                // 左键双击
+                MessageBoxA(hWnd, "托盘图标被左键双击", "提示", MB_OK);
+                break;
             }
-            if (lParam == WM_RBUTTONUP) {
-                // 右键菜单等
-            }
+            return 0;
+        }
             break;
 
         default:

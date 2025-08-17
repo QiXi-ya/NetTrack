@@ -50,3 +50,5 @@ std::vector<SendFileInfo> sendFileList;
 
 int whle_temp = 0;
 int whle = 0;
+
+bool isTrd = false;
