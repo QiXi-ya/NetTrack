@@ -1922,7 +1922,6 @@ void choose5OBI(int i)
         del.close();
         Net::exit();
         exit(0xFF);
-
     }
 }
 

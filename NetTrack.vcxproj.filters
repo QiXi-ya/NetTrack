@@ -15,130 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NetTrack.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="message.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="html.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="code_save.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Net.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="msg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowEv.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ease.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Graph_Manager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WPOC.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="trd.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FileCheck.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="firstStart.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="IMG.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="AES.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FileControl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="NetCode.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Tool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="portGet.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="message.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="html.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="code.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="msg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowsEv.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ease.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WPOC.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="trd.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FileCheck.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="img.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="AES.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FileControl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FirstStart.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NetCode.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Tool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="portget.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Net.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="NetTrack.ico">
       <Filter>资源文件</Filter>
     </Image>
@@ -150,5 +26,129 @@
     <ResourceCompile Include="NetTrack.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AES.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\code.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ease.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileCheck.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FileControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FirstStart.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\html.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\img.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\message.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\msg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Net.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NetCode.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\portget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\trd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WindowsEv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WPOC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cpp\AES.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\code_save.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ease.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\FileCheck.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\FileControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\firstStart.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\Graph_Manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\html.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\IMG.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\message.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\msg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\Net.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\NetCode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\NetTrack.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\portGet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\Tool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\trd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\WindowEv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\WPOC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
