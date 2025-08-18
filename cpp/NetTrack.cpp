@@ -30,6 +30,7 @@
 #include <wininet.h>
 
 #define IDI_ICON1 101
+#define WM_SHOWMAINWINDOW (WM_USER + 100)
 
 //#pragma comment(linker, "/subsystem:console")
 
@@ -78,11 +79,7 @@ public:
 };
 
 
-
-
-
-
-color_t mainColor = RGB(155, 255, 200); // 主颜色
+color_t mainColor = RGB(190, 190, 255); // 主颜色  RGB(155, 255, 200);
 
 
 // ========== 绘图函数 ==========
@@ -7984,7 +7981,7 @@ void DrawChoose(int userBarChoose)
         }
     }
 
-    if ((linkJD != "N" && userBarChoose == 1 && AddLinkXChange < windowSize.x / 4 * 3) || (mousePos.y > windowSize.y - 60 && userBarChoose != 6))
+    if (((linkJD != "N" && userBarChoose == 1 && AddLinkXChange < windowSize.x / 4 * 3) || (mousePos.y > windowSize.y - 60 && userBarChoose != 6)) && Window::isForegroundWindow())
     {
         if (!upLink)
         {
@@ -8282,7 +8279,7 @@ void Draw()
         if (targetW < startSize.x && targetH < startSize.y) t = ease::easeOut(t, 2.5);
         else
         {
-            t = ease::easeInOutBack(t, 1.2);
+            t = ease::easeInOutBack(t, 0.8);
         }
 
         int newX = static_cast<int>(startPos.x + (targetX - startPos.x) * t);
@@ -8754,7 +8751,7 @@ void Math()
     if (clock_math == 179)
     {
         DarkMode = Window::IsDarkModeEnabled();
-        if (DarkMode)mainColor = EGERGB(155, 255, 200);
+        if (DarkMode)mainColor = EGERGB(155, 255, 200);// EGERGB(190, 190, 255); //
 		else mainColor = EGERGB(55, 155, 100);
     }
     mousePos = Window::GetMousePos();
@@ -9022,6 +9019,7 @@ void Math()
 int keep = 0;
 POINT kgs1 = { 0,0 };
 POINT kgs2 = { 0,0 };
+bool isKEY_0x02 = true;
 void Key()
 {
     bool mouseLeftDown = true;
@@ -9029,117 +9027,147 @@ void Key()
     while (1)
     {
         api_sleep(10);
-        if (msg::noBarH() && !needlockX)
+        if(!isTrd)
         {
-            if (keystate(0x10) && keystate(0x56) && keystate(0x11))
+            if (msg::noBarH() && !needlockX)
             {
-                int color[3] = { 150,150,150 };
-                int FontColor[3] = { 0,0,0 };
-                string b[3] = { "OK","NULL","NULL" };
-                msg::MessageBar(color, FontColor, "NetTrack - v0.1_bf_Beta", b);
-            }
-
-            if (keystate(0x01))
-            {
-                mouseOSN = 40;
-                mouseOS = Window::GetMousePosX();
-
-                if (isSendFileQuickSee && KEY)
+                if (keystate(0x10) && keystate(0x56) && keystate(0x11))
                 {
-                    isSendFileQuickSee = false;
-                    isSendFileQuickSee_frame = 0;
+                    int color[3] = { 150,150,150 };
+                    int FontColor[3] = { 0,0,0 };
+                    string b[3] = { "OK","NULL","NULL" };
+                    msg::MessageBar(color, FontColor, "NetTrack - v0.1_bf_Beta", b);
                 }
 
-                if(keystate(0x11))
+                if (keystate(0x01))
                 {
-                    if (keep == 0)
-                    {
-                        kgs1 = Window::GetMousePosX();
-                    }
-                    
+                    mouseOSN = 40;
+                    mouseOS = Window::GetMousePosX();
 
-                    if (keep < 20)keep += 1;
-                    else
+                    if (isSendFileQuickSee && KEY)
                     {
-                        kgs2 = Window::GetMousePosX();
-                        if (kgs1.x - kgs2.x > 100)
+                        isSendFileQuickSee = false;
+                        isSendFileQuickSee_frame = 0;
+                    }
+
+                    if (keystate(0x11))
+                    {
+                        if (keep == 0)
                         {
-                            if (!isSendFileQuickSee)
-                            {
-                                isSendFileQuickSee = true;
-                                isSendFileQuickSee_frame = 0;
-                            }
-                            KEY = false;
-                            kgs2 = kgs1 = { 0,0 };
+                            kgs1 = Window::GetMousePosX();
                         }
 
+
+                        if (keep < 20)keep += 1;
+                        else
+                        {
+                            kgs2 = Window::GetMousePosX();
+                            if (kgs1.x - kgs2.x > 100)
+                            {
+                                if (!isSendFileQuickSee)
+                                {
+                                    isSendFileQuickSee = true;
+                                    isSendFileQuickSee_frame = 0;
+                                }
+                                KEY = false;
+                                kgs2 = kgs1 = { 0,0 };
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        keep = 0;
                     }
                 }
                 else
                 {
+                    KEY = true;
                     keep = 0;
                 }
+
+                if (keystate(0x02))
+                {
+                    if(isKEY_0x02)
+                    {
+                        if (!isTrd)
+                        {
+                            isTrd = true;
+                            isTrdX = 0;
+                            isKEY_0x02 = false;
+                        }
+                    }
+                }
+                else
+                {
+                    isKEY_0x02 = true;
+                }
+
+                if (isMessage == false && !resizing)
+                {
+                    mouse_msg mouseMsg;
+                    if (mousemsg())
+                    {
+                        mouseMsg = getmouse();
+                        if (mouseMsg.is_wheel())   whle_temp = mouseMsg.wheel / 2;
+                        if (mouseMsg.is_left())
+                        {
+                            if (mouseLeftDown == true)
+                            {
+
+                                if (isBar)
+                                {
+                                    if (mousePos.x < 200 && mousePos.x > 30)
+                                    {
+                                        for (int i = 0; i < 6; i++)
+                                            if (mousePos.y > 60 + wordHigh * (i + 1) - wordHigh / 2 && mousePos.y < 60 + wordHigh * (i + 1) + wordHigh / 2 && userBarChoose != i)
+                                            {
+                                                if (bar_imgX_frame < 120)
+                                                {
+                                                    barimgTEMP = userBarChoose;
+                                                }
+                                                userBarChoose = i;
+                                                lineLong = 0;
+                                                lineLong_frame = 0;
+                                                wordSZT[i] = 1;
+                                                CBDS_frame = 0;
+                                                CBOS = 150;
+
+                                                whle = whle_temp = 0;
+                                                whleHistory = 0;
+                                                bar_imgX_frame = 0;
+
+                                                linkX_frame[LKA] = 59;
+                                                LKA = -1;
+                                            }
+                                    }
+                                }
+                                mouseLeftDown = false;
+                            }
+                            else
+                            {
+                                mouseLeftDown = true;
+                            }
+                        }
+                        flushmouse();
+                    }
+                }
+            }
+            if (needlockX)
+            {
+                needlock::key();
+            }
+        }
+        else
+        {
+            if (isGraph)
+            {
+
             }
             else
             {
-                KEY = true;
-                keep = 0;
+
             }
-
-
-            if (isMessage == false && !resizing)
-            {
-                mouse_msg mouseMsg;
-                if (mousemsg())
-                {
-                    mouseMsg = getmouse();
-                    if (mouseMsg.is_wheel())   whle_temp = mouseMsg.wheel / 2;
-                    if (mouseMsg.is_left())
-                    {
-                        if (mouseLeftDown == true)
-                        {
-
-                            if (isBar)
-                            {
-                                if (mousePos.x < 200 && mousePos.x > 30)
-                                {
-                                    for (int i = 0; i < 6; i++)
-                                        if (mousePos.y > 60 + wordHigh * (i + 1) - wordHigh / 2 && mousePos.y < 60 + wordHigh * (i + 1) + wordHigh / 2 && userBarChoose != i)
-                                        {
-                                            if (bar_imgX_frame < 120)
-                                            {
-                                                barimgTEMP = userBarChoose;
-                                            }
-                                            userBarChoose = i;
-                                            lineLong = 0;
-                                            lineLong_frame = 0;
-                                            wordSZT[i] = 1;
-                                            CBDS_frame = 0;
-                                            CBOS = 150;
-
-                                            whle = whle_temp = 0;
-                                            whleHistory = 0;
-                                            bar_imgX_frame = 0;
-
-                                            linkX_frame[LKA] = 59;
-                                            LKA = -1;
-                                        }
-                                }
-                            }
-                            mouseLeftDown = false;
-                        }
-                        else
-                        {
-                            mouseLeftDown = true;
-                        }
-                    }
-                    flushmouse();
-                }
-            }
-        }
-        if (needlockX)
-        {
-            needlock::key();
         }
     }
 }
@@ -9208,8 +9236,8 @@ int ReadIni() {
         if (userset[4] != "0") userSaveDir = tool::string_to_wstring(userset[4]);
         else userSaveDir = Net::GetDownloadFolderPath();
         if (userset[5].empty()) userset[5] = "30";
-        if (userset[6].empty()) userset[5] = "70";
-        if (userset[7].empty()) userset[5] = "0";
+        if (userset[6].empty()) userset[6] = "70";
+        if (userset[7].empty()) userset[7] = "0";
         if (userset[8].empty()) userset[8] = "20";
         if(userset[9].empty()) userset[9] = "0";
 
@@ -9278,6 +9306,351 @@ int ReadIni() {
 
 };
 
+// 设置窗口样式为无标题栏、无边框、TOOLWINDOW
+void SetWindowNoBorderToolStyle(HWND hWnd) {
+    // 获取当前样式
+    LONG_PTR style = GetWindowLongPtr(hWnd, GWL_STYLE);
+    LONG_PTR exStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+
+    // 移除标题栏和边框相关样式
+    style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_BORDER);
+
+    // 添加TOOLWINDOW样式
+    style |= WS_POPUP;  // 通常无边框窗口使用POPUP样式
+    exStyle |= WS_EX_TOOLWINDOW;
+
+    // 应用新样式
+    SetWindowLongPtr(hWnd, GWL_STYLE, style);
+    SetWindowLongPtr(hWnd, GWL_EXSTYLE, exStyle);
+
+    // 强制窗口重绘以应用新样式
+    SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
+// 恢复窗口默认样式（有标题栏、边框、非TOOLWINDOW）
+void RestoreWindowDefaultStyle(HWND hWnd) {
+    // 获取当前样式
+    LONG_PTR style = GetWindowLongPtr(hWnd, GWL_STYLE);
+    LONG_PTR exStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+
+    // 添加默认窗口样式
+    style |= WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+
+    // 移除TOOLWINDOW样式
+    exStyle &= ~WS_EX_TOOLWINDOW;
+
+    // 应用新样式
+    SetWindowLongPtr(hWnd, GWL_STYLE, style);
+    SetWindowLongPtr(hWnd, GWL_EXSTYLE, exStyle);
+
+    // 强制窗口重绘以应用新样式
+    SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
+void trd()
+{
+    MSG msg = {};
+        
+        POINT mouseScreenPos;
+        GetCursorPos(&mouseScreenPos);
+        int Y = 0;
+        cleardevice();
+        resizewindow(1, 1);
+        DarkMode = Window::IsDarkModeEnabled();
+        if (DarkMode)
+        {
+            setbkcolor(EGERGB(50, 50, 50));
+            BKcolor = 20;
+        }
+        else
+        {
+            setbkcolor(EGERGB(240, 240, 240));
+            BKcolor = 240;
+        }
+        SetWindowNoBorderToolStyle(mainWindow);
+        UINT backdropType = DWMWCP_ROUND;
+        DwmSetWindowAttribute(mainWindow, DWMWA_WINDOW_CORNER_PREFERENCE, &backdropType, sizeof(backdropType));
+        showwindow();
+        wstring netTrackActions[8][6] = {
+            // 中文
+            {
+                L"显示NetTrack界面", L"发送文件", L"断开连接",
+                L"退出NetTrack", L"终止NetTrack", L""
+            },
+            // English
+            {
+                L"Show NetTrack", L"Send File", L"Disconnect",
+                L"Exit NetTrack", L"Terminate NetTrack", L""
+            },
+            // 日本語
+            {
+                L"NetTrackを表示", L"ファイルを送信", L"接続を切断",
+                L"NetTrackを終了", L"NetTrackを強制終了", L""
+            },
+            // 한국어
+            {
+                L"NetTrack 표시", L"파일 전송", L"연결 끊기",
+                L"NetTrack 종료", L"NetTrack 강제 종료", L""
+            },
+            // Français
+            {
+                L"Afficher NetTrack", L"Envoyer un fichier", L"Déconnecter",
+                L"Quitter NetTrack", L"Arrêter NetTrack", L""
+            },
+            // Deutsch
+            {
+                L"NetTrack anzeigen", L"Datei senden", L"Verbindung trennen",
+                L"NetTrack beenden", L"NetTrack abbrechen", L""
+            },
+            // Русский
+            {
+                L"Показать NetTrack", L"Отправить файл", L"Отключиться",
+                L"Выйти из NetTrack", L"Завершить NetTrack", L""
+            },
+            // Español
+            {
+                L"Mostrar NetTrack", L"Enviar archivo", L"Desconectar",
+                L"Salir de NetTrack", L"Terminar NetTrack", L""
+            }
+        };
+        for (int i = 1; i < 61; i++)
+        {
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            if (msg.message == WM_TASKBARCREATED) {
+                WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
+            }
+            delay_fps(60);
+            cleardevice();
+            int start = 0;
+            int end = 500;
+            double t = i / (double)60;
+            Y = start + (end - start) * ease::easeOutBack(t, 1.5);
+            movewindow(mouseScreenPos.x, mouseScreenPos.y - Y);
+            resizewindow(Y * 300 / 500, Y);
+
+            for (int i = 0; i < 5; i++)
+            {
+                DrawManager::setFillRectColor();
+                DrawManager::fillroundrectwithrect(25, 15 + i * (10 + Y / 7), Y * 300 / 500 - 25 * 2, 50, 10);
+                DrawManager::setFont(Y / 15);
+                DrawManager::centerText();
+                xyprintf(Y * 300 / 500 / 2, 40 + i * (10 + Y / 7), netTrackActions[stoi(userset[0])][i].c_str());
+                DrawManager::startText();
+            }
+        }
+        int ORX = -1;
+
+        int alpha[5] = { 0,0,0,0,0 };
+        while (1)
+        {
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            if (msg.message == WM_TASKBARCREATED) {
+                WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
+            }
+            delay_fps(60);
+            cleardevice();
+            POINT mousePosR = Window::GetMousePos();
+
+            mousePos = Window::GetMousePosX();
+
+            int page = -1;
+            for (int i = 0; i < 5; i++)
+            {
+                if (mousePos.x > 25 && mousePos.x < 275 && mousePos.y > 15 + i * (10 + Y / 7) && mousePos.y < 15 + i * (10 + Y / 7) + 50)
+                {
+                    page = i;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (i == page)
+                {
+                    if (alpha[i] < 100)
+                    {
+                        if (alpha[i] + 8 < 100)alpha[i] += 8;
+                        else alpha[i] = 100;
+                    }
+                }
+                else
+                {
+                    if (alpha[i] > 0)
+                    {
+                        if (alpha[i] - 8 > 0)alpha[i] -= 8;
+                        else alpha[i] = 0;
+                    }
+                }
+
+                DrawManager::setFillRectColor();
+                DrawManager::fillroundrectwithrect(25, 15 + i * (10 + Y / 7), Y * 300 / 500 - 25 * 2, 50, 10);
+                if (i == page)
+                {
+                    setfillcolor(EGERGBA(155, 155, 155, alpha[i]));
+                    ege_fillroundrect(25, 15 + i * (10 + Y / 7), Y * 300 / 500 - 25 * 2, 50, 10);
+                }
+                DrawManager::setFont(500 / 15);
+                DrawManager::centerText();
+                xyprintf(300 / 2, 40 + i * (10 + Y / 7), netTrackActions[stoi(userset[0])][i].c_str());
+                DrawManager::startText();
+            }
+
+            if (keystate(0x01))
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    if (mousePos.x > 25 && mousePos.x < 275 && mousePos.y > 15 + i * (10 + Y / 7) && mousePos.y < 15 + i * (10 + Y / 7) + 50)
+                    {
+                        ORX = i;
+                        break;
+                    }
+                }
+            }
+
+            if (mousePosR.x < -30 || mousePosR.x > 330 || mousePosR.y < -30 || mousePosR.y > 530 || !Window::isForegroundWindow())
+            {
+                isTrd = false;
+                break;
+            }
+
+            int ORX = -1;
+
+            if (keystate(0x01))
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    if (mousePos.x > 25 && mousePos.x < 275 && mousePos.y > 15 + i * (10 + Y / 6) && mousePos.y < 15 + i * (10 + Y / 6) + 50)
+                    {
+                            ORX = i;
+                    }
+                }
+                break;
+            }
+        }
+        for (int i = 1; i < 61; i++)
+        {
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            if (msg.message == WM_TASKBARCREATED) {
+                WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
+            }
+            api_sleep(5);
+            cleardevice();
+            int start = 500;
+            int end = 0;
+            double t = i / (double)60;
+            Y = start + (end - start) * ease::easeInBack(t, 1.5);
+            movewindow(mouseScreenPos.x, mouseScreenPos.y - Y);
+            resizewindow(Y * 300 / 500, Y);
+
+            for (int i = 0; i < 5; i++)
+            {
+                DrawManager::setFillRectColor();
+                DrawManager::fillroundrectwithrect(25, 15 + i * (10 + Y / 7), Y * 300 / 500 - 25 * 2, 50, 10);
+                DrawManager::setFont(Y / 15);
+                DrawManager::centerText();
+                xyprintf(Y * 300 / 500 / 2, 40 + i * (10 + Y / 7), netTrackActions[stoi(userset[0])][i].c_str());
+                DrawManager::startText();
+            }
+        }
+        hidewindow();
+        RestoreWindowDefaultStyle(mainWindow);
+        UINT backdropTypeB = DWMWCP_DEFAULT;
+        DwmSetWindowAttribute(mainWindow, DWMWA_WINDOW_CORNER_PREFERENCE, &backdropTypeB, sizeof(backdropTypeB));
+        resizewindow(screen.x / 4 * 3, screen.y / 4 * 3);
+
+        if (ORX == 0)
+        {
+            isGraph = true;
+        }
+        if (ORX == 1)
+        {
+            isGraph = true;
+            if (bar_imgX_frame < 120)
+            {
+                barimgTEMP = userBarChoose;
+            }
+            userBarChoose = 1;
+            lineLong = 0;
+            lineLong_frame = 0;
+            wordSZT[1] = 1;
+            CBDS_frame = 0;
+            CBOS = 150;
+
+            whle = whle_temp = 0;
+            whleHistory = 0;
+            bar_imgX_frame = 0;
+
+            linkX_frame[LKA] = 59;
+            LKA = -1;
+        }
+        if (ORX == 2)
+        {
+            if (linkJD != "N")
+            {
+                pair<string, unsigned short> a = code::decode_ip_port(linkJD);
+                Net::SendXorString(a.first, a.second + 1, "linkStopPlease");
+                std::string waitForDisconnect[8] = {
+              "等待对方停止连接",          // Chinese (Simplified)
+               "Waiting for the peer to disconnect",  // English
+            "相手の切断を待機中",        // Japanese
+             "상대방의 연결 해제를 기다리는 중",  // Korean
+             "En attente de la déconnexion de l'appareil distant",  // French
+             "Warte auf Trennung durch die Gegenstelle",  // German
+               "Ожидание отключения удалённой стороны",  // Russian
+               "Esperando a que el dispositivo remoto se desconecte"  // Spanish
+                };
+                int c[3] = { 155,255,200 };
+                int fc[3] = { -1,-1,-1 };
+                msg::Message(3, c, fc, 0, waitForDisconnect[stoi(userset[0])]);
+            }
+        }
+        if (ORX == 3)
+        {
+            if (linkJD != "N")
+            {
+                pair<string, unsigned short> a = code::decode_ip_port(linkJD);
+                Net::SendXorString(a.first, a.second + 1, "linkStopPlease");
+                std::string waitForDisconnect[8] = {
+              "等待对方停止连接",          // Chinese (Simplified)
+               "Waiting for the peer to disconnect",  // English
+            "相手の切断を待機中",        // Japanese
+             "상대방의 연결 해제를 기다리는 중",  // Korean
+             "En attente de la déconnexion de l'appareil distant",  // French
+             "Warte auf Trennung durch die Gegenstelle",  // German
+               "Ожидание отключения удалённой стороны",  // Russian
+               "Esperando a que el dispositivo remoto se desconecte"  // Spanish
+                };
+                int c[3] = { 155,255,200 };
+                int fc[3] = { -1,-1,-1 };
+                msg::Message(3, c, fc, 0, waitForDisconnect[stoi(userset[0])]);
+            }
+            thread a(exitPXD);
+            a.detach();
+            isExit_main = true;
+            isExit_Shell = true;
+        }
+        if (ORX == 4)
+        {
+            exit(0xFF);
+        }
+
+        isTrd = false;
+}
+
 int main(HINSTANCE hInstance, HINSTANCE, int) {
 
     SetProcessDPIAware();
@@ -9305,7 +9678,11 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
     }
 
     
-
+    if (NULL != FindWindowW(L"NetTrack", L"NetTrack"))
+    {
+        PostMessageW(FindWindowW(L"NetTrack", L"NetTrack"), WM_SHOWMAINWINDOW, NULL, NULL);
+        exit(5);
+    }
     
 
     colorPrintf color;
@@ -9659,33 +10036,33 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
     thread am(GetProcess);
     am.detach();
 
-    wstring netTrackBackground[8] = {
-        // 中文（简体）
-        L"NetTrack 正在后台运行",
+    //wstring netTrackBackground[8] = {
+    //    // 中文（简体）
+    //    L"NetTrack 正在后台运行",
 
-        // 英文
-        L"NetTrack is now running in background",
+    //    // 英文
+    //    L"NetTrack is now running in background",
 
-        // 日语
-        L"NetTrack がバックグラウンドで動作中です",
+    //    // 日语
+    //    L"NetTrack がバックグラウンドで動作中です",
 
-        // 韩语
-        L"NetTrack 이(가) 백그라운드에서 실행 중",
+    //    // 韩语
+    //    L"NetTrack 이(가) 백그라운드에서 실행 중",
 
-        // 法语
-        L"NetTrack s'exécute maintenant en arrière-plan",
+    //    // 法语
+    //    L"NetTrack s'exécute maintenant en arrière-plan",
 
-        // 德语
-        L"NetTrack läuft jetzt im Hintergrund",
+    //    // 德语
+    //    L"NetTrack läuft jetzt im Hintergrund",
 
-        // 俄语
-        L"NetTrack теперь работает в фоновом режиме",
+    //    // 俄语
+    //    L"NetTrack теперь работает в фоновом режиме",
 
-        // 西班牙语
-        L"NetTrack se está ejecutando en segundo plano"
-    };
+    //    // 西班牙语
+    //    L"NetTrack se está ejecutando en segundo plano"
+    //};
 
-    trd::ShowTrayMessage(mainHwnd, netTrackBackground[stoi(userset[0])].c_str(), L"NetTrack", 0);
+    //trd::ShowTrayMessage(mainHwnd, netTrackBackground[stoi(userset[0])].c_str(), L"NetTrack", 0);
 
     if(userset[2] == "0")
     {
@@ -9728,119 +10105,375 @@ int main(HINSTANCE hInstance, HINSTANCE, int) {
         a.detach();
     }
 
-    DarkMode = Window::IsDarkModeEnabled();
-    if (DarkMode)mainColor = EGERGB(155, 255, 200);
-    else mainColor = EGERGB(55, 155, 100);
-    int BKCOLOR = 0;
-    if (DarkMode)
-    {
-        setbkcolor(EGERGB(20, 20, 20));
-        BKCOLOR = 20;
-        BKcolor = 20;
-    }
-    else
-    {
-        setbkcolor(EGERGB(240, 240, 240));
-        BKCOLOR = 240;
-        BKcolor = 240;
-    }
-
-    showwindow();
-
-    if(noFirstStart)
-    {
-        int frameS = 0;
-        for (frameS; frameS < 60; frameS++)
-        {
-            api_sleep(10);
-
-            double t = frameS / (double)60;
-
-            int start = screen.y + 50;
-            int end = 50;
-            double v = start + (end - start) * ease::easeOut(t, 5);
-
-            movewindow(screen.x / 2 - screen.x / 4 * 3 / 2, v);
-        }
-    }
-
     
 
+    int trdX = 0;
     int rd = 255;
-    while (is_run()) {
-        if (first::firststartA)
+    isExit_Shell = false;
+
+    isGraph = false;
+
+    int alpha[5] = { 0,0,0,0,0 };
+
+    while(!isExit_Shell)
+    {
+        while (!isGraph)
         {
-            if (msg::GetMessageBarChoose() == 1 || msg::GetMessageBarChoose() == 2)
+            rd = 255;
+            api_sleep(10);
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
             {
-                exit(-1);
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            if (msg.message == WM_TASKBARCREATED) {
+                WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
+            }
+            if (isTrd) trd();
+            if (isExit_Shell || isExit_main) break;
+        }
+        if (isExit_Shell) break;
+        cleardevice();
+        DarkMode = Window::IsDarkModeEnabled();
+        if (DarkMode)mainColor = EGERGB(155, 255, 200);
+        else mainColor = EGERGB(55, 155, 100);
+        int BKCOLOR = 0;
+        if (DarkMode)
+        {
+            setbkcolor(EGERGB(20, 20, 20));
+            BKCOLOR = 20;
+            BKcolor = 20;
+        }
+        else
+        {
+            setbkcolor(EGERGB(240, 240, 240));
+            BKCOLOR = 240;
+            BKcolor = 240;
+        }
+        if(isGraph) showwindow();
+        if (noFirstStart)
+        {
+            int frameS = 0;
+            for (frameS; frameS < 60; frameS++)
+            {
+                api_sleep(10);
+
+                double t = frameS / (double)60;
+
+                int start = screen.y + 50;
+                int end = 50;
+                double v = start + (end - start) * ease::easeOut(t, 5);
+
+                movewindow(screen.x / 2 - screen.x / 4 * 3 / 2, v);
+            }
+        }
+
+        //绘图主循环
+        while (!isExit_main && isGraph) {
+            if (first::firststartA && isGraph)
+            {
+                if (msg::GetMessageBarChoose() == 1 || msg::GetMessageBarChoose() == 2)
+                {
+                    exit(-1);
+                }
+
+                if (msg::GetMessageBarChoose() == 0)
+                {
+                    remove("lcin.dll");
+                    first::firststartA = false;
+                }
+            }
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            if (msg.message == WM_TASKBARCREATED) {
+                WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
+            }
+                delay_fps(60);
+                cleardevice();
+                if (!isTrd)
+                {
+                    if (!Manager)
+                    {
+                        Draw();
+                        if (rd > 0)
+                        {
+                            rd -= 15;
+                            setcolor(EGERGBA(BKCOLOR, BKCOLOR, BKCOLOR, rd));
+                            setfillcolor(EGERGBA(BKCOLOR, BKCOLOR, BKCOLOR, rd));
+                        }
+                        Math();
+                        if (rd > 0) ege_fillrect(0, 0, windowSize.x, windowSize.y);
+                    }
+                }
+                else
+                {
+                    PIMAGE back_temp = newimage();
+                    getimage(back_temp, screenShot, 0, 0, windowSize.x, windowSize.y);
+                    img::BlurWithDownscale_Gaussian(back_temp, 5, 5);
+                    putimage(0, 0, back_temp);
+
+                    if (isTrdX < 30)
+                    {
+                        double t = isTrdX / (double)30;
+
+                        int start = 0;
+                        int end = 150;
+
+                        trdX = start + (end - start) * ease::easeOut(t, 3.5);
+
+                        isTrdX++;
+                    }
+
+                    if (DarkMode) setfillcolor(EGERGBA(0, 0, 0, trdX * 150 / 150));
+                    else setfillcolor(EGERGBA(0, 0, 0, trdX * 90 / 150));
+
+                    ege_fillrect(0, 0, windowSize.x, windowSize.y);
+
+                    DrawManager::setFillRectColor();
+                    DrawManager::fillroundrectwithrect(trdX, trdX, windowSize.x - trdX * 2, windowSize.y - trdX * 2, 10);
+
+                    mousePos = Window::GetMousePosX();
+
+                    std::wstring netTrackActions[8][6] = {
+                        // 中文
+                        {
+                            L"隐藏NetTrack界面", L"发送文件", L"断开连接",
+                            L"退出NetTrack", L"终止NetTrack", L""
+                        },
+                        // English
+                        {
+                            L"Hide NetTrack", L"Send File", L"Disconnect",
+                            L"Exit NetTrack", L"Terminate NetTrack", L""
+                        },
+                        // 日本語
+                        {
+                            L"NetTrackを隠す", L"ファイルを送信", L"接続を切断",
+                            L"NetTrackを終了", L"NetTrackを強制終了", L""
+                        },
+                        // 한국어
+                        {
+                            L"NetTrack 숨기기", L"파일 전송", L"연결 끊기",
+                            L"NetTrack 종료", L"NetTrack 강제 종료", L""
+                        },
+                        // Français
+                        {
+                            L"Masquer NetTrack", L"Envoyer un fichier", L"Déconnecter",
+                            L"Quitter NetTrack", L"Arrêter NetTrack", L""
+                        },
+                        // Deutsch
+                        {
+                            L"NetTrack verstecken", L"Datei senden", L"Verbindung trennen",
+                            L"NetTrack beenden", L"NetTrack abbrechen", L""
+                        },
+                        // Русский
+                        {
+                            L"Скрыть NetTrack", L"Отправить файл", L"Отключиться",
+                            L"Выйти из NetTrack", L"Завершить NetTrack", L""
+                        },
+                        // Español
+                        {
+                            L"Ocultar NetTrack", L"Enviar archivo", L"Desconectar",
+                            L"Salir de NetTrack", L"Terminar NetTrack", L""
+                        }
+                    };
+
+                    int page = -1;
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (mousePos.x > trdX + 50 && mousePos.x < windowSize.x - trdX - 50 && mousePos.y > trdX + 50 + i * (30 + trdX / 3) && mousePos.y < trdX + 50 + i * (30 + trdX / 3) + 50)
+                        {
+                            page = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (i == page)
+                        {
+                            if (alpha[i] < 100)
+                            {
+                                if (alpha[i] + 8 < 100)alpha[i] += 8;
+                                else alpha[i] = 100;
+                            }
+                        }
+                        else
+                        {
+                            if (alpha[i] > 0)
+                            {
+                                if (alpha[i] - 8 > 0)alpha[i] -= 8;
+                                else alpha[i] = 0;
+                            }
+                        }
+
+                        DrawManager::setFillRectColor();
+                        DrawManager::fillroundrectwithrect(trdX + 50, trdX + 50 + i * (30 + trdX / 3), windowSize.x - trdX * 2 - 100, 50, 10);
+                        if (i == page)
+                        {
+                            setfillcolor(EGERGBA(155, 155, 155, alpha[i]));
+                            ege_fillroundrect(trdX + 50, trdX + 50 + i * (30 + trdX / 3), windowSize.x - trdX * 2 - 100, 50, 10);
+                        }
+                        DrawManager::setFont(35);
+                        DrawManager::centerText();
+                        xyprintf(windowSize.x / 2, trdX + 75 + i * (30 + trdX / 3), netTrackActions[stoi(userset[0])][i].c_str());
+                        DrawManager::startText();
+                    }
+
+                    if (keystate(0x01))
+                    {
+                        int ORX = -1;
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (mousePos.x > trdX + 50 && mousePos.x < windowSize.x - (trdX + 50))
+                            {
+                                if (mousePos.y > trdX + 50 + i * (30 + trdX / 3) && mousePos.y < trdX + 50 + i * (30 + trdX / 3) + 50)
+                                {
+                                    ORX = i;
+                                }
+                            }
+                        }
+                        for (int i = 15; i >= 0; i--)
+                        {
+                            delay_fps(100);
+                            putimage(0, 0, screenShot);
+                            putimage_alphablend(NULL, back_temp, 0, 0, i * 16);
+
+                            if (DarkMode) setfillcolor(EGERGBA(0, 0, 0, i * 150 / 15));
+                            else setfillcolor(EGERGBA(0, 0, 0, i * 90 / 15));
+                            ege_fillrect(0, 0, windowSize.x, windowSize.y);
+                        }
+                        isTrd = false;
+                        if (ORX == 0)
+                        {
+                            isExit_main = true;
+                        }
+                        if (ORX == 1)
+                        {
+                            if (bar_imgX_frame < 120)
+                            {
+                                barimgTEMP = userBarChoose;
+                            }
+                            userBarChoose = 1;
+                            lineLong = 0;
+                            lineLong_frame = 0;
+                            wordSZT[1] = 1;
+                            CBDS_frame = 0;
+                            CBOS = 150;
+
+                            whle = whle_temp = 0;
+                            whleHistory = 0;
+                            bar_imgX_frame = 0;
+
+                            linkX_frame[LKA] = 59;
+                            LKA = -1;
+                        }
+                        if (ORX == 2)
+                        {
+                            if (linkJD != "N")
+                            {
+                                pair<string, unsigned short> a = code::decode_ip_port(linkJD);
+                                Net::SendXorString(a.first, a.second + 1, "linkStopPlease");
+                                std::string waitForDisconnect[8] = {
+                              "等待对方停止连接",          // Chinese (Simplified)
+                               "Waiting for the peer to disconnect",  // English
+                            "相手の切断を待機中",        // Japanese
+                             "상대방의 연결 해제를 기다리는 중",  // Korean
+                             "En attente de la déconnexion de l'appareil distant",  // French
+                             "Warte auf Trennung durch die Gegenstelle",  // German
+                               "Ожидание отключения удалённой стороны",  // Russian
+                               "Esperando a que el dispositivo remoto se desconecte"  // Spanish
+                                };
+                                int c[3] = { 155,255,200 };
+                                int fc[3] = { -1,-1,-1 };
+                                msg::Message(3, c, fc, 0, waitForDisconnect[stoi(userset[0])]);
+                            }
+                        }
+                        if (ORX == 3)
+                        {
+                            if (linkJD != "N")
+                            {
+                                pair<string, unsigned short> a = code::decode_ip_port(linkJD);
+                                Net::SendXorString(a.first, a.second + 1, "linkStopPlease");
+                                std::string waitForDisconnect[8] = {
+                              "等待对方停止连接",          // Chinese (Simplified)
+                               "Waiting for the peer to disconnect",  // English
+                            "相手の切断を待機中",        // Japanese
+                             "상대방의 연결 해제를 기다리는 중",  // Korean
+                             "En attente de la déconnexion de l'appareil distant",  // French
+                             "Warte auf Trennung durch die Gegenstelle",  // German
+                               "Ожидание отключения удалённой стороны",  // Russian
+                               "Esperando a que el dispositivo remoto se desconecte"  // Spanish
+                                };
+                                int c[3] = { 155,255,200 };
+                                int fc[3] = { -1,-1,-1 };
+                                msg::Message(3, c, fc, 0, waitForDisconnect[stoi(userset[0])]);
+                            }
+                            thread a(exitPXD);
+                            a.detach();
+                            isExit_main = true;
+                            isExit_Shell = true;
+                        }
+                        if (ORX == 4)
+                        {
+                            exit(0xFF);
+                        }
+                    }
+                }
+        }
+
+        
+
+        POINT ms = Window::GetWindowPos();
+        POINT rsb = Window::GetWindowSize();
+
+        PIMAGE rt = newimage();
+        getimage(rt, 0, 0, rsb.x, rsb.y);
+        img::BlurWithDownscale(rt, 2, 2); // 2倍降采样
+        int rs = 20;
+        int mg = 0;
+        subAlpha = 0;
+        for (int i = 0; i < 50; i++)
+        {
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
             }
 
-            if (msg::GetMessageBarChoose() == 0)
-            {
-                remove("lcin.dll");
-                first::firststartA = false;
-            }
+            api_sleep(10);
+            cleardevice();
+            putimage(0, 0, rt);
+            movewindow(ms.x, ms.y - mg);
+            mg += rs;
+            rs -= 2;
         }
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+        ShowWindow(mainWindow, SW_MINIMIZE);
+        isGraph = false;
+        delimage(rt);
+        hidewindow();
+        isExit_main = false;
+        if (!isExit_Shell)
         {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-        if (msg.message == WM_TASKBARCREATED) {
-            WindowProc_class::WindowProc(mainHwnd, msg.message, msg.wParam, msg.lParam);
-        }
-        delay_fps(60);
-        cleardevice();
-        if(!Manager)
-        {
-            Draw();
-            if (rd > 0)
-            {
-                rd -= 15;
-                setcolor(EGERGBA(BKCOLOR, BKCOLOR, BKCOLOR, rd));
-                setfillcolor(EGERGBA(BKCOLOR, BKCOLOR, BKCOLOR, rd));
-            }
-            Math();
-            if (rd > 0) ege_fillrect(0, 0, windowSize.x, windowSize.y);
+            wstring minimizeToTrayMessageW[8] = {
+          L"NetTrack将会缩小至托盘并继续在后台运行",  // Chinese
+            L"NetTrack will minimize to tray and keep running in background",  // English
+            L"NetTrackはトレイに最小化され、バックグラウンドで動作し続けます",  // Japanese
+            L"NetTrack은 트레이로 최소화되고 백그라운드에서 계속 실행됩니다",  // Korean
+           L"NetTrack se réduira dans la barre d'état et continuera à fonctionner",  // French
+           L"NetTrack wird in das Tray minimiert und im Hintergrund weiterlaufen",  // German
+          L"NetTrack свернётся в трей и продолжит работать в фоновом режиме",  // Russian
+         L"NetTrack se minimizará a la bandeja y seguirá ejecutándose en segundo plano"  // Spanish
+            };
+            trd::ShowTrayMessage(mainHwnd, minimizeToTrayMessageW[stoi(userset[0])].c_str(), L"NetTrack", 0);
         }
     }
 
 
     ini::SaveData();
 
-    POINT ms = Window::GetWindowPos();
-    POINT rsb = Window::GetWindowSize();
-
-    PIMAGE rt = newimage();
-    getimage(rt, 0, 0, rsb.x, rsb.y);
-    img::BlurWithDownscale(rt, 2, 2); // 2倍降采样
-
-
-    int rs = 20;
-    int mg = 0;
-    subAlpha = 0;
-    for (int i = 0; i < 50; i++)
-    {
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-
-        api_sleep(10);
-        cleardevice();
-        putimage(0, 0, rt);
-        movewindow(ms.x, ms.y - mg);
-        mg += rs;
-        rs -= 2;
-    }
-    ShowWindow(mainWindow, SW_MINIMIZE);
-
-    LONG style3 = GetWindowLong(mainWindow, GWL_EXSTYLE);
-    style3 |= WS_EX_TOOLWINDOW;
-    SetWindowLong(mainWindow, GWL_EXSTYLE, style);
-
-    delimage(rt);
     trd::RemoveTrayIcon(mainHwnd);
     WindowProc_class::UninstallMouseHook();
     delimage(gogogo);

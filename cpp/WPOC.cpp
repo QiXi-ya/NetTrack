@@ -1,4 +1,4 @@
-#include "Main.h"
+ï»¿#include "Main.h"
 #include "WPOC.h"
 #include "WindowsEv.h"
 #include "trd.h"
@@ -6,11 +6,12 @@
 
 #define WM_TRAYICON (WM_USER + 1)
 
+#define WM_SHOWMAINWINDOW (WM_USER + 100)
 
-    //mainHwnd Ö÷³ÌĞò´°¿Ú¹ı³Ì
+    //mainHwnd ä¸»ç¨‹åºçª—å£è¿‡ç¨‹
     LRESULT CALLBACK WindowProc_class::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         if (message == WM_TASKBARCREATED) {
-            // ExplorerÖØÆô£¬ÖØĞÂÌí¼ÓÍĞÅÌÍ¼±ê
+            // Exploreré‡å¯ï¼Œé‡æ–°æ·»åŠ æ‰˜ç›˜å›¾æ ‡
             trd::InitTrayIcon(mainHwnd, L"NetTrack");
         }
         mainHwnd = hWnd;
@@ -19,23 +20,35 @@
             trd::RemoveTrayIcon(mainHwnd);
             PostQuitMessage(0);
             break;
+        case WM_SHOWMAINWINDOW:
+        {
+            if (!isGraph) isGraph = true;
+            wstring runningInBackgroundK[8] = {
+    L"NetTrackå·²åœ¨åå°è¿è¡Œ",         // Chinese
+    L"NetTrack is running in background", // English
+    L"NetTrackã¯ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§å‹•ä½œä¸­ã§ã™", // Japanese
+    L"NetTrackì´(ê°€) ë°±ê·¸ë¼ìš´ë“œì—ì„œ ì‹¤í–‰ ì¤‘ì…ë‹ˆë‹¤", // Korean
+    L"NetTrack fonctionne en arriÃ¨re-plan", // French
+    L"NetTrack lÃ¤uft im Hintergrund", // German
+    L"NetTrack Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ĞµÑ‚ Ğ² Ñ„Ğ¾Ğ½Ğ¾Ğ²Ğ¾Ğ¼ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ", // Russian
+    L"NetTrack se estÃ¡ ejecutando en segundo plano" // Spanish
+            };
+            trd::ShowTrayMessage(mainHwnd, runningInBackgroundK[stoi(userset[0])].c_str(), L"NetTrack", 1);
+            break;
+        }
         case WM_TRAYICON:
         {
-            // ´¦ÀíÍĞÅÌÍ¼±êÏûÏ¢
-            // ÓÃ»§µã»÷ÁËÆøÅİ
-            
             switch (lParam) {
             case WM_LBUTTONDOWN:
-                // ×ó¼üµã»÷
-                MessageBoxA(hWnd, "ÍĞÅÌÍ¼±ê±»×ó¼üµã»÷", "ÌáÊ¾", MB_OK);
+                // å·¦é”®ç‚¹å‡»
+                if (!isGraph) isGraph = true;
                 break;
             case WM_RBUTTONDOWN:
-                // ÓÒ¼üµã»÷
-                MessageBoxA(hWnd, "ÍĞÅÌÍ¼±ê±»ÓÒ¼üµã»÷", "ÌáÊ¾", MB_OK);
-                break;
-            case WM_LBUTTONDBLCLK:
-                // ×ó¼üË«»÷
-                MessageBoxA(hWnd, "ÍĞÅÌÍ¼±ê±»×ó¼üË«»÷", "ÌáÊ¾", MB_OK);
+                if (!isTrd)
+                {
+                    isTrd = true;
+                    isTrdX = 0;
+                }
                 break;
             }
             return 0;
@@ -47,7 +60,7 @@
         }
         return 0;
     }
-    //mainWindow Ö÷Í¼ĞÎ½çÃæ(EGE)¹ı³Ìº¯Êı
+    //mainWindow ä¸»å›¾å½¢ç•Œé¢(EGE)è¿‡ç¨‹å‡½æ•°
     LRESULT CALLBACK WindowProc_class::EGE_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
         if (message == WM_SIZE) {
             if (wParam == SIZE_MAXIMIZED && max_EGE == false)
@@ -72,11 +85,29 @@
                 movewindow(resizeRect.left, resizeRect.top, false);
             }
         }
-        // ÆäËûÏûÏ¢½»¸øÔ­´°¿Ú¹ı³Ì
+        if (message == WM_CLOSE || message == WM_DESTROY) {
+            isExit_main = true;
+        }
+        if (message == WM_SHOWMAINWINDOW)
+        {
+            wstring runningInBackgroundW[8] = {
+    L"NetTrackå·²åœ¨åå°è¿è¡Œ",         // Chinese
+    L"NetTrack is running in background", // English
+    L"NetTrackã¯ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§å‹•ä½œä¸­ã§ã™", // Japanese
+    L"NetTrackì´(ê°€) ë°±ê·¸ë¼ìš´ë“œì—ì„œ ì‹¤í–‰ ì¤‘ì…ë‹ˆë‹¤", // Korean
+    L"NetTrack fonctionne en arriÃ¨re-plan", // French
+    L"NetTrack lÃ¤uft im Hintergrund", // German
+    L"NetTrack Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ĞµÑ‚ Ğ² Ñ„Ğ¾Ğ½Ğ¾Ğ²Ğ¾Ğ¼ Ñ€ĞµĞ¶Ğ¸Ğ¼Ğµ", // Russian
+    L"NetTrack se estÃ¡ ejecutando en segundo plano" // Spanish
+            };
+            trd::ShowTrayMessage(mainHwnd, runningInBackgroundW[stoi(userset[0])].c_str(), L"NetTrack", 1);
+            if (!isGraph) isGraph = true;
+        }
+        // å…¶ä»–æ¶ˆæ¯äº¤ç»™åŸçª—å£è¿‡ç¨‹
         return CallWindowProc(g_EGE_OldWndProc, hWnd, message, wParam, lParam);
     }
 
-    //ÓÒ¼üËÉ¿ª¹³×Ó;
+    //å³é”®æ¾å¼€é’©å­;
     LRESULT CALLBACK WindowProc_class::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
         if (nCode == HC_ACTION) {
             MSLLHOOKSTRUCT* p = (MSLLHOOKSTRUCT*)lParam;
@@ -102,9 +133,9 @@
         return CallNextHookEx(g_mouseHook, nCode, wParam, lParam);
     }
 
-    //×Ó´°¿Ú¹ı³Ìº¯Êı
+    //å­çª—å£è¿‡ç¨‹å‡½æ•°
     LRESULT CALLBACK WindowProc_class::SubWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-        int borderWidth = 6; // ĞéÏß¿í¶È
+        int borderWidth = 6; // è™šçº¿å®½åº¦
         switch (msg) {
         case WM_SIZE: {
             RECT rc;
@@ -128,7 +159,7 @@
             COLORREF rgb = RGB(155, 255, 200);
             int borderWidth = 6;
             int dashLen = 18, gapLen = 10;
-            int r = 18; // Ô²½Ç°ë¾¶
+            int r = 18; // åœ†è§’åŠå¾„
             BYTE alpha = subAlpha;
 
             memset(bits, 0, w * h * 4);
@@ -141,10 +172,10 @@
 
 
 
-                // »­ËÄÌõ±ß£¨ĞéÏß£©
+                // ç”»å››æ¡è¾¹ï¼ˆè™šçº¿ï¼‰
 
 
-                        // ÉÏ±ß
+                        // ä¸Šè¾¹
                 for (int x = r; x < w - r; x += dashLen + gapLen) {
                     for (int dx = 0; dx < dashLen && x + dx < w - r; ++dx) {
                         for (int bw = 0; bw < borderWidth; ++bw) {
@@ -152,7 +183,7 @@
                         }
                     }
                 }
-                // ÏÂ±ß
+                // ä¸‹è¾¹
                 for (int x = r; x < w - r; x += dashLen + gapLen) {
                     for (int dx = 0; dx < dashLen && x + dx < w - r; ++dx) {
                         for (int bw = 0; bw < borderWidth; ++bw) {
@@ -160,7 +191,7 @@
                         }
                     }
                 }
-                // ×ó±ß
+                // å·¦è¾¹
                 for (int y = r; y < h - r; y += dashLen + gapLen) {
                     for (int dy = 0; dy < dashLen && y + dy < h - r; ++dy) {
                         for (int bw = 0; bw < borderWidth; ++bw) {
@@ -168,7 +199,7 @@
                         }
                     }
                 }
-                // ÓÒ±ß
+                // å³è¾¹
                 for (int y = r; y < h - r; y += dashLen + gapLen) {
                     for (int dy = 0; dy < dashLen && y + dy < h - r; ++dy) {
                         for (int bw = 0; bw < borderWidth; ++bw) {
@@ -176,8 +207,8 @@
                         }
                     }
                 }
-                // ËÄ¸öÔ²½Ç£¨ÊµÏß£©
-                // ×óÉÏ½Ç
+                // å››ä¸ªåœ†è§’ï¼ˆå®çº¿ï¼‰
+                // å·¦ä¸Šè§’
                 for (int t = 0; t < 90; ++t) {
                     double rad = t * 3.14159265 / 180.0;
                     int cx = r, cy = r;
@@ -187,7 +218,7 @@
                         putpixel_alpha(px, py);
                     }
                 }
-                // ÓÒÉÏ½Ç
+                // å³ä¸Šè§’
                 for (int t = 0; t < 90; ++t) {
                     double rad = t * 3.14159265 / 180.0;
                     int cx = w - r - 1, cy = r;
@@ -197,9 +228,9 @@
                         putpixel_alpha(px, py);
                     }
                 }
-                // ÓÒÏÂ½Ç
+                // å³ä¸‹è§’
                 for (int t = 0; t < 90; ++t) {
-                    double rad = (t + 360) * 3.14159265 / 180.0; // 270~360¶È
+                    double rad = (t + 360) * 3.14159265 / 180.0; // 270~360åº¦
                     int cx = w - r - 1, cy = h - r - 1;
                     for (int bw = 0; bw < borderWidth; ++bw) {
                         int px = static_cast<int>(cx + (r - bw) * cos(rad));
@@ -207,7 +238,7 @@
                         putpixel_alpha(px, py);
                     }
                 }
-                // ×óÏÂ½Ç
+                // å·¦ä¸‹è§’
                 for (int t = 0; t < 90; ++t) {
                     double rad = t * 3.14159265 / 180.0;
                     int cx = r, cy = h - r - 1;
@@ -221,7 +252,7 @@
 
             }
 
-            // ²ãµş´°¿Ú¸üĞÂ
+            // å±‚å çª—å£æ›´æ–°
             POINT ptSrc = { 0, 0 };
             SIZE sizeWnd = { w, h };
             BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
@@ -240,8 +271,8 @@
             break;
         }
         case WM_LBUTTONDOWN: {
-            // ÅĞ¶ÏÊÇ·ñÔÚ±ßÔµ£¬¿ªÊ¼µ÷Õû´óĞ¡
-            //MessageBoxA(NULL, "×Ó´°¿Ú", "ÌáÊ¾", MB_OK | MB_ICONINFORMATION);
+            // åˆ¤æ–­æ˜¯å¦åœ¨è¾¹ç¼˜ï¼Œå¼€å§‹è°ƒæ•´å¤§å°
+            //MessageBoxA(NULL, "å­çª—å£", "æç¤º", MB_OK | MB_ICONINFORMATION);
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
             RECT rc;
             GetClientRect(hWnd, &rc);
@@ -263,12 +294,12 @@
         return 0;
     }
 
-    // ÔÚ³ÌĞò³õÊ¼»¯Ê±µ÷ÓÃ
+    // åœ¨ç¨‹åºåˆå§‹åŒ–æ—¶è°ƒç”¨
     void WindowProc_class::InstallMouseHook() {
         g_mouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, NULL, 0);
     }
 
-    // ³ÌĞòÍË³öÊ±µ÷ÓÃ
+    // ç¨‹åºé€€å‡ºæ—¶è°ƒç”¨
     void WindowProc_class::UninstallMouseHook() {
         if (g_mouseHook) UnhookWindowsHookEx(g_mouseHook);
     }

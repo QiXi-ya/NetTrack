@@ -84,3 +84,7 @@ extern int whle_temp;
 extern int whle;
 
 extern bool isTrd;
+extern int isTrdX;
+extern bool isGraph;
+extern bool isExit_main;
+extern bool isExit_Shell;

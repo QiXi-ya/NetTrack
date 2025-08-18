@@ -52,3 +52,10 @@ int whle_temp = 0;
 int whle = 0;
 
 bool isTrd = false;
+int isTrdX = 0;
+
+bool isGraph = true;
+
+bool isExit_main = false;
+
+bool isExit_Shell = false;
